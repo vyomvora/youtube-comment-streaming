@@ -99,7 +99,7 @@ class SlidingWindowAnalyzer:
         return filtered_words
 
 class KafkaStreamProcessor:
-    def __init__(self, kafka_host="3.89.117.169", kafka_port=9092, topic="youtube-comments"):
+    def __init__(self, kafka_host="35.173.231.218", kafka_port=9092, topic="youtube-comments"):
         self.kafka_host = kafka_host
         self.kafka_port = kafka_port
         self.topic = topic
@@ -387,7 +387,7 @@ def main():
     
     st.markdown("---")
     
-    # Dashboard metrics (existing functionality)
+    # Dashboard metrics
     if st.session_state.processor.comments_data:
         st.subheader("Overall Statistics")
         
@@ -411,41 +411,25 @@ def main():
         with col4:
             if comments_list:
                 st.metric("Last Update", comments_list[-1]['processed_time'])
-    
-        
-        # Charts row
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Sentiment distribution
-            sentiment_counts = Counter(c['sentiment'] for c in comments_list)
-            
-            fig_pie = px.pie(
-                values=list(sentiment_counts.values()),
-                names=list(sentiment_counts.keys()),
-                title="Sentiment Distribution (Recent Messages)",
-                color_discrete_map={
-                    'Positive': '#00CC96',
-                    'Negative': '#EF553B',
-                    'Neutral': '#636EFA'
-                }
-            )
-            st.plotly_chart(fig_pie, use_container_width=True)
-        
-        with col2:
-            # Sentiment over time
-            if st.session_state.processor.sentiment_history:
-                sentiment_df = pd.DataFrame(list(st.session_state.processor.sentiment_history))
-                
-                fig_line = px.line(
-                    sentiment_df,
-                    x='time',
-                    y='polarity',
-                    title="Sentiment Polarity Over Time",
-                    color_discrete_sequence=['#FF6B6B']
-                )
-                fig_line.update_layout(xaxis_title="Time", yaxis_title="Polarity Score")
-                st.plotly_chart(fig_line, use_container_width=True)
+       
+        sentiment_counts = Counter(c['sentiment'] for c in comments_list)
+
+        fig_pie = px.pie(
+            values=list(sentiment_counts.values()),
+            names=list(sentiment_counts.keys()),
+            title="Sentiment Distribution",
+            color_discrete_map={
+                'Positive': '#00CC96',
+                'Negative': '#EF553B',
+                'Neutral': '#636EFA'
+            }
+        )
+        st.markdown(
+            "<div style='display: flex; justify-content: center;'>",
+            unsafe_allow_html=True
+        )
+        st.plotly_chart(fig_pie, use_container_width=False)
+        st.markdown("</div>", unsafe_allow_html=True)
         
         # Recent comments table
         st.subheader("Recent Comments")
