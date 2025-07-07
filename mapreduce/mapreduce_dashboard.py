@@ -29,7 +29,7 @@ def load_s3_file(filename, file_type="csv"):
 
 # Main dashboard
 st.title("MapReduce Results Dashboard")
-st.markdown("Simple dashboard showing MapReduce processing results from S3")
+st.markdown("Dashboard showing MapReduce processing results from S3 output bucket")
 
 # Sidebar for selecting results
 st.sidebar.header("Select Results")

@@ -88,7 +88,7 @@ class S3KafkaIngestion:
                 # Flush and wait
                 self.producer.flush()
                 
-                print(f"📤 Sent batch {i//batch_size + 1}: {sent_count}/{total_records} records")
+                print(f"Sent batch {i//batch_size + 1}: {sent_count}/{total_records} records")
                 
                 # Simulate real-time streaming
                 if i + batch_size < total_records:
@@ -103,17 +103,11 @@ class S3KafkaIngestion:
             self.producer.close()
     
     def run_ingestion(self, bucket_name, file_key, batch_size=10, delay_seconds=1):
-        print("Starting S3 to Kafka Ingestion Pipeline")
-        print("=" * 60)
-        
-        # Step 1: Read from S3
+        print("Starting S3 to Kafka Ingestion Pipeline")        
         df = self.read_from_s3(bucket_name, file_key)
-        
         if df is None:
             print("Failed to read data from S3. Stopping.")
             return False
-        
-        # Step 2: Stream to Kafka
         self.stream_to_kafka(df, batch_size, delay_seconds)
         
         print("\n Ingestion pipeline completed!")
@@ -135,11 +129,9 @@ def main():
     
     
     print("YouTube Comment Data Ingestion")
-    print("=" * 40)
     print(f"Source: s3://{S3_BUCKET}/{S3_FILE_KEY}")
     print(f"Target: Kafka @ {KAFKA_HOST}:{KAFKA_PORT}")
     print(f"Topic: {KAFKA_TOPIC}")
-    print("=" * 40)
     
     
     try:

@@ -97,8 +97,8 @@ class DataProcessor:
         timestamps = []
         
         for i in range(len(self.df)):
-            # Add some randomness to make it realistic
-            random_minutes = random.randint(0, 1440)  # 24 hours in minutes
+            # Add some randomnesc
+            random_minutes = random.randint(0, 1440)
             timestamp = start_time + timedelta(minutes=random_minutes)
             timestamps.append(timestamp)
         

@@ -16,7 +16,6 @@ import psutil
 
 class SlidingWindowAnalyzer:
     def __init__(self):
-        # Store all messages with timestamps for sliding window analysis
         self.all_messages = deque(maxlen=10000)
         
     def add_message(self, message_data: Dict):
@@ -79,7 +78,7 @@ class SlidingWindowAnalyzer:
         # Split into words
         words = text.split()
         
-        # common stop words and short words
+        # common stop words
         stop_words = {
             'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 
             'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had',
@@ -91,7 +90,7 @@ class SlidingWindowAnalyzer:
             'where', 'when', 'so', 'than', 'too', 'very', 'can', 'just', 'now', 'also'
         }
         
-        # Filter words: remove stop words, short words, and numbers
+        # Filter stop words and numbers
         filtered_words = [
             word for word in words 
             if len(word) > 2 and word not in stop_words and not word.isdigit()
@@ -107,7 +106,6 @@ class KafkaStreamProcessor:
         self.consumer = None
         self.is_running = False
         
-        # Thread-safe queue for storing messages
         self.message_queue = queue.Queue(maxsize=1000)
         
         # Data storage (keep last 100 messages for display)
@@ -203,16 +201,14 @@ class KafkaStreamProcessor:
                                 # Add to sliding window analyzer
                                 self.window_analyzer.add_message(processed_record)
                                 
-                                # Add to queue (non-blocking)
                                 try:
                                     self.message_queue.put_nowait(processed_record)
                                     print(f"Added message to queue: {processed_record['comment_id']}")
                                 except queue.Full:
-                                    # Remove oldest message if queue is full
                                     try:
                                         self.message_queue.get_nowait()
                                         self.message_queue.put_nowait(processed_record)
-                                        print("🔄 Queue full, replaced oldest message")
+                                        print("Queue full, replaced oldest message")
                                     except queue.Empty:
                                         pass
                             else:
@@ -268,7 +264,6 @@ class KafkaStreamProcessor:
         return new_messages
 
 def render_sliding_window_metrics(processor):
-    """Render 5-minute sliding window metrics"""
     st.subheader("Last 5 Minutes Analysis")
     
     # Get window statistics (fixed 5 minutes)
