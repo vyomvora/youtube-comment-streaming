@@ -29,7 +29,6 @@ def load_s3_file(filename, file_type="csv"):
 
 # Main dashboard
 st.title("MapReduce Results Dashboard")
-st.markdown("Dashboard showing MapReduce processing results from S3 output bucket")
 
 # Sidebar for selecting results
 st.sidebar.header("Select Results")
@@ -54,12 +53,13 @@ selected_file = st.sidebar.selectbox(
 if selected_file:
     # Extract timestamp from filename
     timestamp = selected_file.replace("performance_metrics_", "").replace(".csv", "")
-    
+    # Load benchmark summary
+    summary = load_s3_file(f"benchmark_summary_{timestamp}.json", "json")
     # Load performance metrics
     perf_df = load_s3_file(f"performance_metrics_{timestamp}.csv", "csv")
     
     if perf_df is not None:
-        st.header("Performance Metrics")
+        st.header(f"Performance Metrics for {summary['num_processes']} processes")
         col1, col2 = st.columns(2)
         
         with col1:
@@ -77,11 +77,9 @@ if selected_file:
     top_words_df = load_s3_file(f"top_words_{timestamp}.csv", "csv")
     
     if top_words_df is not None:
-        st.header("Top Words")
-        # Simple filter for number of words to display
-        num_words = st.slider("Number of top words to show", 5, 50, 10)
+        st.header("Top 5 Words")
         st.dataframe(
-            top_words_df[['word', 'count', 'rank']].head(num_words),
+            top_words_df[['word', 'count', 'rank']].head(5),
             use_container_width=True
         )
     
@@ -94,14 +92,10 @@ if selected_file:
             sentiment_df[['sentiment', 'count']].set_index('sentiment'),
             use_container_width=True
         )
-
-    # Load benchmark summary
-    summary = load_s3_file(f"benchmark_summary_{timestamp}.json", "json")
     
     if summary:
         st.header("Summary")
         st.write(f"Processed {summary['total_comments']} comments")
-        st.write(f"Using {summary['num_processes']} processes")
         st.write(f"Timestamp: {datetime.strptime(summary['timestamp'], '%Y%m%d_%H%M%S').strftime('%Y-%m-%d %H:%M:%S')}")
 
 else:

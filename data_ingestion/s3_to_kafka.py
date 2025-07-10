@@ -115,7 +115,7 @@ class S3KafkaIngestion:
 
 def main():
     
-    KAFKA_HOST = "35.173.231.218"
+    KAFKA_HOST = "13.221.93.55"
     KAFKA_PORT = 9092
     KAFKA_TOPIC = "youtube-comments"
     

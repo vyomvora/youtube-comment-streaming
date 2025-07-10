@@ -16,7 +16,7 @@ from data_processor import DataProcessor
 
 class MapReduceProcessor:
     def __init__(self, num_processes=None, s3_output_bucket="youtube-comment-output"):
-        self.num_processes = num_processes or mp.cpu_count()
+        self.num_processes = num_processes
         self.s3_bucket = s3_output_bucket
     
     def map_word_count(self, text_chunk):
@@ -199,7 +199,6 @@ class MapReduceProcessor:
         return word_count, processing_time
     
     def benchmark_performance(self, comments, sentiments=None):
-        """Compare sequential vs parallel performance and save to S3"""
         print("\n" + "="*50)
         print("PERFORMANCE BENCHMARK")
         print("="*50)
@@ -321,21 +320,19 @@ class MapReduceProcessor:
         print(f"All results saved to S3 bucket: {self.s3_bucket}/mapreduce-results/")
 
 def main():
-    """Test the MapReduce processor with S3 output"""
-    print("Testing MapReduce Processor with S3 Output")
-    print("="*50)
     s3_input_bucket = "youtube-comments-input" 
     s3_input_file = "youtubecommentscleaned.csv"
     
     # Load and preprocess data
     processor = DataProcessor(s3_input_bucket, s3_input_file)
     
-    # Use first 5000 comments for testing (you can increase this)
-    processor.df = processor.df.head(5000)
+    processor.df = processor.df
     processed_df = processor.preprocess_data()
+
+    num_processes = 16
     
     # Initialize MapReduce with S3 output
-    mapreduce = MapReduceProcessor(s3_output_bucket="youtube-comments-output")
+    mapreduce = MapReduceProcessor(num_processes=num_processes,s3_output_bucket="youtube-comments-output")
     
     # Run benchmark
     results = mapreduce.benchmark_performance(
